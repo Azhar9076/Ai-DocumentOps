@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-100 text-ink-900 antialiased;
+  background-image:
+    radial-gradient(900px 500px at 12% -10%, rgba(59, 130, 246, 0.1), transparent 60%),
+    radial-gradient(700px 420px at 92% 0%, rgba(16, 185, 129, 0.08), transparent 55%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .glass {
+    @apply rounded-2xl border border-white/60 bg-white/70 shadow-panel backdrop-blur-md;
+  }
+  .panel-title {
+    @apply text-sm font-semibold uppercase tracking-wide text-ink-500;
+  }
+  .input-base {
+    @apply w-full rounded-lg border border-ink-200 bg-white/80 px-3 py-2 text-sm text-ink-900 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-ink-900 text-white hover:bg-ink-700;
+  }
+  .btn-secondary {
+    @apply btn border border-ink-200 bg-white/80 text-ink-900 hover:bg-white;
+  }
+  .btn-danger {
+    @apply btn border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100;
+  }
+}
