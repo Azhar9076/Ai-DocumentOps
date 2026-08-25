@@ -36,11 +36,14 @@ Unknown routes redirect to `/`.
   Don't treat that as a failure; assert the final all-green state plus the result card.
 - Every upload permanently adds a document, shifting dashboard/quality numbers. Snapshot
   expected values immediately before the assertion, or re-seed between runs.
-- Known issue: the PDF preview pane on `/documents/:id` may be blank because
-  `GET /api/documents/{id}/file` uses `FileResponse(..., filename=...)`, which sets
-  `Content-Disposition: attachment` and makes Chrome download instead of embedding.
-  Workaround/fix: drop the `filename=` argument or set `content-disposition: inline`.
-  Images (`<img>`) still render fine despite the attachment header.
+- PDF preview: if the pane on `/documents/:id` is blank and Chrome shows a download bubble,
+  check the header with `curl -D- -o /dev/null localhost:8000/api/documents/<id>/file`.
+  `FileResponse(..., filename=...)` sets `Content-Disposition: attachment`, which stops Chrome
+  from embedding the PDF in the `<object>`; passing
+  `headers={"content-disposition": f'inline; filename="{name}"'}` instead makes it render.
+  Images (`<img>`) render fine either way, so only PDFs expose this class of bug.
+  When asserting the PDF actually rendered, click the embedded viewer's "+" zoom button a
+  couple of times — the default fit-to-width render is too small for legible screenshot proof.
 
 ## Devin Secrets Needed
 None — everything runs locally with the seeded Postgres credentials above.
