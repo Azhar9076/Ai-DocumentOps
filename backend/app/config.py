@@ -15,10 +15,10 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     
     # IBM Watson Credentials
-    watsonx_api_key: str = ""
-    watsonx_project_id: str = ""
     watsonx_url: str = "https://us-south.ml.cloud.ibm.com"
-    watsonx_model_id: str = "ibm/granite-3-0-8b-instruct"
+    watsonx_api_key: str = "StxByWjg3HI_AbnKMcq2ag6ONNIQUqr_0vrQPzPtfYNs"
+    watsonx_project_id: str = "1c8f21bf-3889-496d-aa61-2e60b5e3af1c"
+    watsonx_model_id: str = "ibm/granite-4-h-small"
     watsonx_deployment_id: str = ""
 
 

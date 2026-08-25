@@ -22,20 +22,7 @@ def extract_fields_with_granite(
 ) -> dict[str, Any]:
     """
     Extract structured fields using IBM Granite 3.0 via watsonx.ai.
-    
-    Args:
-        document_text: The document text (markdown from Docling)
-        doc_type: Document type (INVOICE, FORM, CONTRACT)
-        schema_fields: List of field names to extract
-        
-    Returns:
-        dict with field values and confidence scores:
-        {
-            "field_name": {"value": "extracted_value", "confidence": 0.95},
-            ...
-        }
     """
-    # Check if credentials are available
     if not settings.watsonx_api_key or not settings.watsonx_project_id:
         logger.warning("Watsonx credentials not configured, using fallback extraction")
         return _fallback_extraction(doc_type, schema_fields)
@@ -43,7 +30,7 @@ def extract_fields_with_granite(
     try:
         return _call_granite_model(document_text, doc_type, schema_fields)
     except Exception as exc:
-        logger.error(f"Granite extraction failed: {exc}, using fallback")
+        logger.error(f"Granite extraction failed: {exc}, using fallback", exc_info=True)
         return _fallback_extraction(doc_type, schema_fields)
 
 
@@ -87,8 +74,14 @@ def _call_granite_model(
         # Call the model
         response = model.generate_text(prompt=prompt)
         
-        # Parse the response
-        result_text = response.get("results", [{}])[0].get("generated_text", "")
+        # ✅ FIX: Handle string vs dictionary returns safely
+        if isinstance(response, str):
+            result_text = response
+        elif isinstance(response, dict):
+            result_text = response.get("results", [{}])[0].get("generated_text", "")
+        else:
+            result_text = str(response)
+
         return _parse_granite_response(result_text, schema_fields)
         
     except ImportError:
@@ -110,6 +103,8 @@ def _build_extraction_prompt(
     prompt = f"""You are a document extraction expert. Extract the following fields from a {doc_type} document.
 
 Fields to extract: {fields_list}
+
+Document text:
 
 Document text:
 ```
