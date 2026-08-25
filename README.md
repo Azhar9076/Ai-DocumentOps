@@ -73,6 +73,9 @@ The frontend reads `VITE_API_BASE` (defaults to `http://localhost:8000`).
 
 ## Checks
 
+The suite runs against an isolated `documentops_test` database
+(`sudo -u postgres createdb -O docops documentops_test`), so the demo data is never touched.
+
 ```bash
 cd backend && .venv/bin/ruff check . && .venv/bin/python -m pytest
 cd frontend && npm run lint && npm run build

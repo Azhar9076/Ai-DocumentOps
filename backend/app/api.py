@@ -64,7 +64,9 @@ def get_document(document_id: str, db: Session = Depends(get_db)) -> DocumentDet
 def get_document_file(document_id: str, db: Session = Depends(get_db)) -> FileResponse:
     document = doc_service.get_document(db, document_id)
     return FileResponse(
-        document.file_path, media_type=document.mime_type or None, filename=document.filename
+        document.file_path,
+        media_type=document.mime_type or None,
+        headers={"content-disposition": f'inline; filename="{document.filename}"'},
     )
 
 
