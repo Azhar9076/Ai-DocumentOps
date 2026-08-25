@@ -101,7 +101,7 @@ def process_document_sync(db: Session, document: Document) -> PipelineOutcome:
         result = validation.validate(candidates, doc_type)
         issues = [issue.as_dict() for issue in result.issues]
         document.validation_errors = json.dumps(issues)
-        log_audit(db, document.id, "RULES_VALIDATED", json.dumps({"issues": issues}))
+        log_audit(db, document.id, "RULES_VALIDATED", json.dumps({"issues": issues, "has_errors": result.has_errors}))
 
         confidence = routing.overall_confidence(result.candidates, classification_confidence)
         status = routing.route(confidence, result.has_errors)

@@ -1,8 +1,30 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+
+from app.db import get_db
+from app.models import DocStatus
+from app.pipeline.runner import PIPELINE_STEPS, process_document
+from app.schemas import (
+    AuditLogOut,
+    DocumentDetail,
+    DocumentSummary,
+    FieldContext,
+    GovernanceReport,
+    IBMStackInfo,
+    MetricsOut,
+    QualityOut,
+    ReviewSubmission,
+    DocumentLineage,
+)
+from app.services import analytics, governance_service
+from app.services import documents as doc_service
+
+logger = logging.getLogger(__name__)
 
 from app.db import get_db
 from app.models import DocStatus
@@ -39,10 +61,15 @@ def pipeline_steps() -> dict[str, list[str]]:
 async def upload_document(
     file: UploadFile = File(...), db: Session = Depends(get_db)
 ) -> DocumentDetail:
-    document = doc_service.store_upload(db, file.filename or "document", file.content_type or "", file.file)
-    await process_document(db, document)
-    db.refresh(document)
-    return doc_service.to_detail(document)
+    try:
+        document = doc_service.store_upload(db, file.filename or "document", file.content_type or "", file.file)
+        await process_document(db, document)
+        db.refresh(document)
+        return doc_service.to_detail(document)
+    except Exception as exc:
+        db.rollback()
+        logger.exception("Upload processing failed")
+        raise HTTPException(status_code=500, detail=f"Document processing failed: {str(exc)}")
 
 
 @router.get("/documents", response_model=list[DocumentSummary])

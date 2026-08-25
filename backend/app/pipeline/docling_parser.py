@@ -29,7 +29,21 @@ def parse_document(path: Path) -> tuple[str, int, float]:
         from docling.document_converter import DocumentConverter
         from docling.datamodel.base_models import InputFormat
         
-        converter = DocumentConverter()
+        # Try to configure Docling options for optimized performance
+        # Disable OCR for native PDFs to speed up processing
+        try:
+            from docling.document_converter import DocumentConverterOptions
+            options = DocumentConverterOptions(
+                do_ocr=(suffix != ".pdf"),  # Disable OCR for PDFs, enable for images
+                do_table_structure=True,    # Retain table parsing
+                do_document_structure=True  # Retain layout parsing
+            )
+            converter = DocumentConverter(options=options)
+            logger.info(f"Docling configured with optimized options for {suffix}")
+        except ImportError:
+            # Fallback to default converter if options not available
+            converter = DocumentConverter()
+            logger.info(f"Docling using default configuration for {suffix}")
         
         # Convert document to Docling document
         result = converter.convert(path)
