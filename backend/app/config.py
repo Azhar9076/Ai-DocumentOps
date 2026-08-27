@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_prefix="DOCOPS_")
 
-    database_url: str = "postgresql+psycopg2://postgres:9494@localhost:5432/documentops"
+    database_url: str = "postgresql://neondb_owner:npg_dnUsS0M5ezRC@ep-restless-sun-aykfnoxu-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
     storage_dir: Path = BASE_DIR / "storage"
     auto_approve_threshold: float = 0.90
     review_threshold: float = 0.70
