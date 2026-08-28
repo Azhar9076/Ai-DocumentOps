@@ -53,14 +53,6 @@ ai_stack/   IBM Docling + IBM Granite 3.0 (watsonx.ai)[cite: 1]
 - PostgreSQL (or Neon DB account)
 - IBM Cloud Account with watsonx.ai access[cite: 1]
 
-# Local Setup
-
-## Prerequisites
-- Python 3.10+
-- Node.js 20+
-- PostgreSQL (or Neon DB account)
-- IBM Cloud Account with watsonx.ai access
-
 ## Environment Variables
 Create a `.env` file inside the `backend/` directory:
 
@@ -69,19 +61,40 @@ WATSONX_APIKEY=your_ibm_cloud_api_key
 WATSONX_PROJECT_ID=your_watsonx_project_id
 DOCOPS_DATABASE_URL=postgresql://user:password@localhost:5432/documentops
 ```
-## Run Backend
-cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m app.seed
-uvicorn app.main:app --reload --port 8000
+## Running the Application
 
-## Run Frontend
+### 1. Backend Service (FastAPI)
+```bash
+# Navigate to backend directory
+cd backend
+
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Seed initial demo data (optional)
+python -m app.seed
+
+# Start development server
+uvicorn app.main:app --reload --port 8000
+```
+## 2.Frontend Setup (Next.js)
+
+### Quick Start
+```bash
+# Navigate to the frontend directory
 cd frontend
+
+# Install dependencies
 npm install
+
+# Start the development server
 npm run dev
-# Application available at http://localhost:3000
+```
 
 ## API Reference
 
