@@ -1,0 +1,38 @@
+Act as a Principal Full-Stack AI Engineer. Help me build "AI DocumentOps" - an Enterprise Document Intelligence & Compliance Audit Engine powered by IBM watsonx.ai and IBM Docling for the IBM SkillsBuild SkillUp Hackathon.
+
+### PROJECT ARCHITECTURE & TECH STACK
+1. Frontend: React / Next.js deployed on Vercel Edge. Features a side-by-side document review UI (PDF Viewer on the left, Extracted Form Fields on the right), confidence indicators, and custom dashboards.
+2. Backend: Python FastAPI running on Render. Handles file uploads, IBM Docling parsing, Granite 3.0 LLM field extraction via watsonx.ai, deterministic rule validation engines, and routing logic.
+3. Database: Neon (Serverless PostgreSQL) storing documents, extracted fields, confidence scores, routing statuses, and immutable audit logs.
+4. Core IBM AI Stack:
+   - IBM Docling for layout-aware document ingestion (converts PDFs/Images/DOCX into clean Markdown while preserving table structures and visual hierarchy).
+   - IBM Granite 3.0 (ibm/granite-4-h-small or granite-3.0-8b-instruct) via watsonx.ai for structured JSON field extraction with confidence scores (0.0 to 1.0).
+
+### THE 7-STAGE SYSTEM PIPELINE
+Implement a deterministic pipeline with these sequential stages:
+1. Upload & Store: Receive files (PDF, PNG, JPG, DOCX), generate an immutable document ID, validate constraints, and store the file.
+2. Parse & Understand: Use IBM Docling to convert the document into structured Markdown + layout metadata. Compute a Page Quality Score. Fall back to OCR if scanned/low-quality.
+3. Structured Field Extraction: Pass Docling Markdown output to Granite 3.0 via IBM watsonx.ai using structured outputs (Pydantic schema). Extract fields: `currency`, `due_date`, `invoice_date`, `invoice_number`, `subtotal`, `tax_amount`, `total_amount`, `vendor_name`, along with per-field confidence scores (0.00–1.00).
+4. Mathematical & Deterministic Rule Engine:
+   - Execute exact arithmetic validation: `expected_total = subtotal + tax_amount`.
+   - If `subtotal + tax_amount != total_amount`, set `is_math_valid = False`.
+   - Penalty logic: If math fails, automatically drop individual confidence scores for `subtotal`, `tax_amount`, and `total_amount` to forced low values (e.g., 50%), flag a clear error message: "Invoice Math: Subtotal (X) + Tax (Y) = Z, which does not match stated Total (W)".
+5. Confidence-Based Routing Engine:
+   - `AUTO_APPROVED`: Overall Confidence >= 90% AND `is_math_valid == True`. Instantly posted to PostgreSQL without human touch.
+   - `NEEDS_REVIEW`: Overall Confidence 70%–89% AND `is_math_valid == True`. Sent to review queue with low-confidence fields highlighted in yellow.
+   - `ACTION_REQUIRED`: Overall Confidence < 70% OR `is_math_valid == False`. Mandatory human verification required. Failing fields highlighted in red.
+6. Persistent Storage (PostgreSQL): Save all normalized document entities, extracted key-value pairs, validation status flags, and user edits.
+7. Immutable Audit Trail: Log every system transition, score calculation, rule flag, and human override with precise timestamps.
+
+### APPLICATION PAGES & UI COMPONENTS TO BUILD
+- Navigation Bar / Sidebar: Links for Executive Dashboard, Upload & Process, Review Queue, How It Works, Accuracy & Quality, and IBM Governance & Trust. Include dynamic status badges for "IBM Docling: Active" and "IBM Granite 3.0: Active".
+- Upload & Process Page: Drag-and-drop zone supporting max 25MB documents. Real-time step tracker (Uploaded -> OCR Processing -> Classified -> Field Extraction -> Validating Rules -> Complete) with execution speed readout (e.g., 17006 ms).
+- Side-by-Side Review Page (The Core Demo View):
+  - Left Side: Interactive PDF/Document viewer.
+  - Right Side: Extracted data form displaying fields with right-aligned confidence badges (e.g., 95% green, 50% red).
+  - Top Banner: Overall confidence pill, status badge (e.g., "96% Approved" or "76% Action Required"), and bright red error alert banner if math check fails.
+- Executive Dashboard: High-level metrics KPI cards (Total Documents Processed, Auto-Automated %, Human Reviews Pending, Average Confidence %, Estimated Hours Saved), 7-day accuracy line chart, confidence distribution bar chart, and recent document queue list.
+- Accuracy & Quality View: Metrics breakdown showing overall field accuracy %, math pass rate %, human correction %, and evaluated document counts.
+- IBM Governance & Trust Page: Real-time service status checks for IBM Docling and watsonx.ai, deployment model info (`ibm/granite-4-h-small`), system health compliance rates, average processing times, status breakdown counters, and an immutable system audit trail table.
+
+Provide the complete file structure, backend FastAPI routes with IBM watsonx integration logic, mathematical validation engine code, Neon database schema, and Next.js frontend components for the side-by-side review and upload interfaces.
