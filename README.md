@@ -1,85 +1,76 @@
-# AI DocumentOps
+Markdown# AI DocumentOps
 
-Document automation platform that turns unstructured business documents (invoices, forms, contracts)
-into validated structured data with field-level confidence scoring and human-in-the-loop review.
+**Enterprise Document Intelligence & Compliance Audit Engine**  
+Powered by **IBM watsonx.ai** & **IBM Docling**
 
-## Architecture
+AI DocumentOps is an automated document processing platform that ingests unstructured business documents (invoices, forms, contracts), extracts key data with layout-aware AI, validates mathematical integrity, and enforces confidence-based human-in-the-loop review.
 
-```
-frontend/  React 19 + Vite + Tailwind + Recharts + Framer Motion + Lucide
-backend/   FastAPI + SQLAlchemy + PostgreSQL, Pydantic extraction schemas, OCR via Tesseract
-```
+---
 
-Pipeline (`backend/app/pipeline/`):
+## Key Features & IBM Stack
 
-| Stage | Module | Behaviour |
+- **IBM Docling Parser**: Layout-aware document parsing that retains visual structure, tables, and hierarchy into clean Markdown (with fallback OCR).
+- **IBM Granite 3.0 via watsonx.ai**: Structured JSON extraction for target fields (`currency`, `dates`, `totals`, `vendor`) with field-level confidence vectors (0.00–1.00).
+- **Deterministic Math Audit Engine**: Executes strict arithmetic checks (`subtotal + tax = total`) prior to posting to database.
+- **Confidence-Based Routing**: Auto-approves high-confidence extractions, queues uncertain fields for review, and forces verification on mathematical mismatches.
+- **Side-by-Side Review Interface**: Interactive document viewer alongside extracted form fields with real-time confidence indicators and error alerts.
+- **Immutable Audit Lineage**: Timestamped tracking of every system extraction, confidence score, rule validation, and human correction[cite: 1].
+
+---
+
+## Core Architecture
+
+frontend/   Next.js / React + Tailwind CSS + Recharts + Framer Motion + Lucide UI[cite: 1]
+backend/    FastAPI (Python) + Neon Serverless PostgreSQL[cite: 1]
+ai_stack/   IBM Docling + IBM Granite 3.0 (watsonx.ai)[cite: 1]
+### 7-Stage Pipeline Flow
+
+| Stage | Module / Component | Behaviour |
 | --- | --- | --- |
-| File validation & storage | `services/documents.py` | Type/size checks, per-document storage folder |
-| Text & visual extraction | `extraction.py` | PDF text layer, OCR fallback (Tesseract), DOCX parsing, OCR quality score |
-| Classification | `classifier.py` | Weighted keyword scoring → `INVOICE` / `FORM` / `CONTRACT` |
-| Structured extraction | `field_extractor.py` | Regex extraction into strict Pydantic schemas, per-field confidence 0.00–1.00 |
-| Validation engine | `validation.py` | Deterministic rules (subtotal + tax = total, formats, required fields) that penalise confidence |
-| Routing | `routing.py` | ≥90% `AUTO_APPROVED`, 70–89% `NEEDS_REVIEW`, <70% or rule failure `ACTION_REQUIRED` |
-| Audit trail | `runner.py` | Every transition, score and reviewer edit appended to `audit_logs` |
+| **1. Upload & Store** | `services/documents.py` | Validates file constraints (PDF, PNG, JPG, DOCX), generates unique Document ID[cite: 1]. |
+| **2. Layout Parsing** | `extraction.py` | **IBM Docling** converts document to structured Markdown + layout metadata[cite: 1]. |
+| **3. Structured Extraction** | `field_extractor.py` | **IBM Granite 3.0 (watsonx.ai)** extracts schema fields with per-field confidence scores[cite: 1]. |
+| **4. Math Engine** | `validation.py` | Validates `subtotal + tax = total`. If invalid, flags discrepancy and lowers field scores[cite: 1]. |
+| **5. Smart Routing** | `routing.py` | `≥90%` AUTO_APPROVED \| `70–89%` NEEDS_REVIEW \| `<70%` or Rule Failure → ACTION_REQUIRED[cite: 1]. |
+| **6. Persistence** | PostgreSQL (Neon) | Stores document entities, extracted values, status flags, and reviewer edits[cite: 1]. |
+| **7. Audit Lineage** | `runner.py` | Records every transition, rule trigger, score update, and edit to immutable audit logs[cite: 1]. |
 
-Tables: `documents`, `extracted_fields`, `reviews`, `audit_logs`.
+---
 
-## Local setup
+## Routing Thresholds
 
-Requirements: Python 3.10+, Node 22 (`.nvmrc`), PostgreSQL 14+, `tesseract-ocr`, `poppler-utils`.
+- **`AUTO_APPROVED` (Confidence $\ge$ 90% & Math Valid)**: Written directly to the database without human touch[cite: 1].
+- **`NEEDS_REVIEW` (Confidence 70–89% & Math Valid)**: Queued for human verification with lowest confidence fields highlighted[cite: 1].
+- **`ACTION_REQUIRED` (Confidence < 70% OR Math Mismatch)**: Forced manual review. Math mismatches route here regardless of overall confidence score[cite: 1].
 
-```bash
-sudo apt-get install -y postgresql tesseract-ocr poppler-utils
-sudo -u postgres psql -c "CREATE USER docops WITH PASSWORD 'docops' SUPERUSER;"
-sudo -u postgres psql -c "CREATE DATABASE documentops OWNER docops;"
+---
 
-# backend
-cd backend
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m app.seed                      # three synthetic demo runs
-.venv/bin/uvicorn app.main:app --reload --port 8000
+## Local Setup
 
-# frontend
-cd ../frontend
-npm install && npm run dev                        # http://localhost:5173
-```
+### Prerequisites
+- Python 3.10+
+- Node.js 20+
+- PostgreSQL (or Neon DB account)
+- IBM Cloud Account with watsonx.ai access[cite: 1]
 
-Configuration is environment-driven with the `DOCOPS_` prefix, e.g.
-`DOCOPS_DATABASE_URL`, `DOCOPS_AUTO_APPROVE_THRESHOLD`, `DOCOPS_REVIEW_THRESHOLD`.
-The frontend reads `VITE_API_BASE` (defaults to `http://localhost:8000`).
+### Environment Variables
+Create a `.env` file inside the `backend/` directory:
+```env
+WATSONX_APIKEY=your_ibm_cloud_api_key
+WATSONX_PROJECT_ID=your_watsonx_project_id
+DOCOPS_DATABASE_URL=postgresql://user:password@localhost:5432/documentops
+Run BackendBashcd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m app.seed
+uvicorn app.main:app --reload --port 8000
+Run FrontendBashcd frontend
+npm install
+npm run dev
+# Application available at http://localhost:3000
+API ReferenceMethodEndpointDescriptionPOST/api/documentsUpload and process a document through the 7-stage engine[cite: 1]GET/api/documentsFetch all documents (optional status filtering)GET/api/documents/{id}Detailed document extraction, confidence breakdown, and audit logGET/api/documents/{id}/fileFetch original file for side-by-side viewerPOST/api/documents/{id}/reviewSubmit human reviewer corrections and approve/rejectPOST/api/documents/{id}/reprocessRe-run document through extraction & validation rulesGET/api/metricsExecutive dashboard aggregate metricsGET/api/qualityField accuracy trends and evaluation metricsDemo ShowcasePerfect Invoice (Auto-Approved)Math Error Discrepancy FlaggedLive Processing PipelineHow It Works ArchitectureExecutive Dashboard MetricsIBM Governance & Trust Center
 
-## Seeded demo runs
-
-`python -m app.seed` generates real files and pushes them through the real pipeline:
-
-| Document | Result |
-| --- | --- |
-| `clean_invoice.pdf` | 96% confidence → `AUTO_APPROVED` |
-| `scanned_form.png` (OCR) | ~71% with two ambiguous handwriting fields → `NEEDS_REVIEW` |
-| `inconsistent_invoice.pdf` | Subtotal 100 + Tax 18 ≠ Total 135 → `ACTION_REQUIRED` with a math validation alert |
-
-## API
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| POST | `/api/documents` | Upload and process a document |
-| GET | `/api/documents` | List documents (optional `?status=`) |
-| GET | `/api/documents/{id}` | Detail with fields, issues, reviews and audit trail |
-| GET | `/api/documents/{id}/file` | Original file for the viewer |
-| POST | `/api/documents/{id}/review` | Submit edits and approve/reject |
-| POST | `/api/documents/{id}/reprocess` | Re-run the pipeline |
-| GET | `/api/metrics` | Dashboard metrics |
-| GET | `/api/quality` | Accuracy and quality evaluation |
-
-## Checks
-
-The suite runs against an isolated `documentops_test` database
-(`sudo -u postgres createdb -O docops documentops_test`), so the demo data is never touched.
-
-```bash
-cd backend && .venv/bin/ruff check . && .venv/bin/python -m pytest
-cd frontend && npm run lint && npm run build
-```
 ## Demo
 <img width="1910" height="903" alt="Screenshot 2026-08-26 005214" src="https://github.com/user-attachments/assets/ba998074-de33-45e7-8520-2504aea108ac" />
 <img width="1912" height="905" alt="Screenshot 2026-08-26 004841" src="https://github.com/user-attachments/assets/89b6c3a4-253f-452c-8c8e-ffbc5c971d7c" />
