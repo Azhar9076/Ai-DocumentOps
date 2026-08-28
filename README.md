@@ -1,4 +1,4 @@
-Markdown# AI DocumentOps
+# AI DocumentOps
 
 **Enterprise Document Intelligence & Compliance Audit Engine**  
 Powered by **IBM watsonx.ai** & **IBM Docling**
@@ -53,23 +53,48 @@ ai_stack/   IBM Docling + IBM Granite 3.0 (watsonx.ai)[cite: 1]
 - PostgreSQL (or Neon DB account)
 - IBM Cloud Account with watsonx.ai access[cite: 1]
 
-### Environment Variables
+# Local Setup
+
+## Prerequisites
+- Python 3.10+
+- Node.js 20+
+- PostgreSQL (or Neon DB account)
+- IBM Cloud Account with watsonx.ai access
+
+## Environment Variables
 Create a `.env` file inside the `backend/` directory:
+
 ```env
 WATSONX_APIKEY=your_ibm_cloud_api_key
 WATSONX_PROJECT_ID=your_watsonx_project_id
 DOCOPS_DATABASE_URL=postgresql://user:password@localhost:5432/documentops
-Run BackendBashcd backend
+```
+## Run Backend
+cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m app.seed
 uvicorn app.main:app --reload --port 8000
-Run FrontendBashcd frontend
+
+## Run Frontend
+cd frontend
 npm install
 npm run dev
 # Application available at http://localhost:3000
-API ReferenceMethodEndpointDescriptionPOST/api/documentsUpload and process a document through the 7-stage engine[cite: 1]GET/api/documentsFetch all documents (optional status filtering)GET/api/documents/{id}Detailed document extraction, confidence breakdown, and audit logGET/api/documents/{id}/fileFetch original file for side-by-side viewerPOST/api/documents/{id}/reviewSubmit human reviewer corrections and approve/rejectPOST/api/documents/{id}/reprocessRe-run document through extraction & validation rulesGET/api/metricsExecutive dashboard aggregate metricsGET/api/qualityField accuracy trends and evaluation metricsDemo ShowcasePerfect Invoice (Auto-Approved)Math Error Discrepancy FlaggedLive Processing PipelineHow It Works ArchitectureExecutive Dashboard MetricsIBM Governance & Trust Center
+
+## API Reference
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/documents` | Upload and process a document through the 7-stage engine |
+| `GET` | `/api/documents` | Fetch all documents (optional status filtering) |
+| `GET` | `/api/documents/{id}` | Detailed document extraction, confidence breakdown, and audit log |
+| `GET` | `/api/documents/{id}/file` | Fetch original file for side-by-side viewer |
+| `POST` | `/api/documents/{id}/review` | Submit human reviewer corrections and approve/reject |
+| `POST` | `/api/documents/{id}/reprocess` | Re-run document through extraction & validation rules |
+| `GET` | `/api/metrics` | Executive dashboard aggregate metrics |
+| `GET` | `/api/quality` | Field accuracy trends and evaluation metrics |
 
 ## Demo
 <img width="1910" height="903" alt="Screenshot 2026-08-26 005214" src="https://github.com/user-attachments/assets/ba998074-de33-45e7-8520-2504aea108ac" />
