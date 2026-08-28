@@ -80,3 +80,17 @@ The suite runs against an isolated `documentops_test` database
 cd backend && .venv/bin/ruff check . && .venv/bin/python -m pytest
 cd frontend && npm run lint && npm run build
 ```
+## Demo
+<img width="1910" height="903" alt="Screenshot 2026-08-26 005214" src="https://github.com/user-attachments/assets/ba998074-de33-45e7-8520-2504aea108ac" />
+<img width="1912" height="905" alt="Screenshot 2026-08-26 004841" src="https://github.com/user-attachments/assets/89b6c3a4-253f-452c-8c8e-ffbc5c971d7c" />
+<img width="1905" height="912" alt="Screenshot 2026-08-26 004950" src="https://github.com/user-attachments/assets/dd8d6576-11d4-468b-a79a-31bc67c19f36" />
+<img width="1908" height="911" alt="Screenshot 2026-08-26 005844" src="https://github.com/user-attachments/assets/8b061809-e353-43b1-83d4-00f267265117" />
+<img width="1902" height="902" alt="Screenshot 2026-08-26 005947" src="https://github.com/user-attachments/assets/8dd91f0f-8f1d-47de-90e9-296bf001382f" />
+<img width="1911" height="907" alt="Screenshot 2026-08-26 010024" src="https://github.com/user-attachments/assets/359580e5-f1fb-4a16-9637-04f070fb7b84" />
+<img width="1907" height="907" alt="Screenshot 2026-08-26 005049" src="https://github.com/user-attachments/assets/c8b98b41-e816-4f2d-bf22-b73d7a4f0beb" />
+<img width="1902" height="903" alt="Screenshot 2026-08-26 005133" src="https://github.com/user-attachments/assets/5f397c65-2dde-4107-a096-8e368e315e2e" />
+
+
+
+
+
