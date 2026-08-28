@@ -700,10 +700,6 @@ The combination of AI-powered extraction and deterministic validation allows the
 
 https://github.com/Azhar9076/Ai-DocumentOps
 
-## Live Application
-
-https://ai-documentops-1.onrender.com
-
 ## Demo
 
 The project demonstration video is included as part of the project submission and demonstrates:
