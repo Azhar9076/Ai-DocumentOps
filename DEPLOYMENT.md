@@ -1,4 +1,4 @@
-﻿# AI DocumentOps — Deployment Guide (Vercel & Render)
+# AI DocumentOps — Deployment Guide (Vercel & Render)
 
 This guide provides step-by-step instructions for deploying **AI DocumentOps**:
 - **Frontend (Vite + React)** on **Vercel**
@@ -87,6 +87,8 @@ This guide provides step-by-step instructions for deploying **AI DocumentOps**:
 
 ## Troubleshooting & Tips
 
+- **PostgreSQL / Supabase Connections on Render**: Render free tier instances do not support outbound IPv6. If using Supabase, replace direct connection port `5432` with the IPv4 Transaction Pooler host on port `6543` (e.g., `postgresql://postgres.[ref]:[pass]@aws-0-[region].pooler.supabase.com:6543/postgres`).
+- **Automatic SQLite Fallback**: If `DATABASE_URL` is unreachable or misconfigured, the backend automatically logs a warning and initializes a resilient SQLite database in `./data/fallback_app.db` without crashing startup.
 - **Cold Starts on Render Free Tier**: Render web services sleep after 15 minutes of inactivity. First request after sleep may take 30–50s.
 - **CORS Issues**: Ensure `DOCOPS_CORS_ORIGINS` on Render is set to `*` or includes your exact Vercel deployment domain.
 - **Neon Database**: Ensure your Neon connection string uses `sslmode=require`.

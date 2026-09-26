@@ -223,3 +223,17 @@ def test_quality_compare_mode(client: TestClient):
     assert "prompt_v2" in data["v1_comparison"]
     assert "delta" in data["v1_comparison"]
 
+
+def test_db_fallback_resilience(monkeypatch):
+    from unittest.mock import MagicMock
+    import app.db as db_module
+
+    mock_engine = MagicMock()
+    mock_engine.connect.side_effect = Exception("Connection refused / Network is unreachable")
+    
+    with monkeypatch.context() as m:
+        m.setattr(db_module, "engine", mock_engine)
+        # Should not raise exception
+        db_module.init_db()
+
+
