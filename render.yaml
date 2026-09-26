@@ -1,0 +1,21 @@
+﻿services:
+  - type: web
+    name: ai-documentops-backend
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DATABASE_URL
+        sync: false
+      - key: DOCOPS_WATSONX_API_KEY
+        sync: false
+      - key: DOCOPS_WATSONX_PROJECT_ID
+        sync: false
+      - key: DOCOPS_WATSONX_URL
+        value: https://us-south.ml.cloud.ibm.com
+      - key: DOCOPS_CORS_ORIGINS
+        value: "*"
