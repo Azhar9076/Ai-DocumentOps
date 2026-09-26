@@ -8,7 +8,13 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.config import settings
 from app.models import Base
 
-db_url = make_url(settings.database_url)
+raw_url = str(settings.database_url).strip()
+if raw_url.startswith("postgres://"):
+    raw_url = raw_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif raw_url.startswith("postgresql://"):
+    raw_url = raw_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+db_url = make_url(raw_url)
 
 engine_kwargs = {}
 if "sqlite" in db_url.drivername:
