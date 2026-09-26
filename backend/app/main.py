@@ -36,6 +36,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root_index() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "service": "AI DocumentOps API",
+        "model": "IBM Granite 3.0 via watsonx.ai",
+        "docs": "/docs",
+        "health": "/health",
+        "api_health": "/api/health",
+        "version": "1.0.0",
+    }
+
+
 @app.get("/health")
 def root_health() -> dict[str, str]:
     return {"status": "ok", "service": "AI DocumentOps", "model": "IBM Granite 3.0 via watsonx.ai"}

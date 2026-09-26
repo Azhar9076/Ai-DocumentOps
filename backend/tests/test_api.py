@@ -40,6 +40,14 @@ def invoice_pdf() -> bytes:
     return buffer.getvalue()
 
 
+def test_root_endpoint(client: TestClient):
+    res = client.get("/")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "ok"
+    assert "service" in data
+
+
 def test_health(client: TestClient):
     res = client.get("/api/health").json()
     assert res["status"] == "ok"
