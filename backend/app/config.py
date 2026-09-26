@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     storage_dir: Path = BASE_DIR / "storage"
     auto_approve_threshold: float = 0.90
     review_threshold: float = 0.70
-    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+    cors_origins: str = "*"
 
     # IBM watsonx.ai fields (Will read DOCOPS_WATSONX_API_KEY, etc.)
     watsonx_api_key: str = ""
