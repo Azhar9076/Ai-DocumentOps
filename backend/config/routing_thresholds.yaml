@@ -1,0 +1,3 @@
+routing_thresholds:
+  auto_approved_min: 0.9
+  needs_review_min: 0.7

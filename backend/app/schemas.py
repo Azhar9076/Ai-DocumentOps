@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -26,6 +27,8 @@ class AuditLogOut(BaseModel):
     performed_by: str
     timestamp: datetime
     details: str
+    run_number: int = 1
+    elapsed_ms: int = 0
 
 
 class ReviewOut(BaseModel):
@@ -56,6 +59,7 @@ class DocumentSummary(BaseModel):
     overall_confidence: float
     uploaded_at: datetime
     processing_ms: int
+    audit_summary: str = ""
 
 
 class DocumentDetail(DocumentSummary):
@@ -81,21 +85,55 @@ class ReviewSubmission(BaseModel):
     note: str = ""
 
 
+class BulkReviewSubmission(BaseModel):
+    document_ids: list[str] = Field(default_factory=list)
+    decision: str = "APPROVE"
+    reviewer_id: str = "reviewer@documentops.ai"
+
+
+class RoutingThresholds(BaseModel):
+    auto_approved_min: float
+    needs_review_min: float
+
+
+class FieldCorrection(BaseModel):
+    field_name: str
+    corrected_value: str
+    reviewer_id: str = "reviewer@documentops.ai"
+
+
 class MetricsOut(BaseModel):
     documents_processed: int
     auto_automation_rate: float
     reviews_pending: int
     average_confidence: float
     estimated_hours_saved: float
+    math_errors_intercepted: int = 0
     status_breakdown: dict[str, int]
     confidence_distribution: list[dict[str, float | str | int]]
     accuracy_trend: list[dict[str, float | str]]
+    roi_metrics: dict[str, Any] = Field(default_factory=dict)
 
 
 class QualityOut(BaseModel):
     overall_accuracy: float
+    routing_accuracy: float = 0.0
     field_accuracy: list[dict[str, float | str | int]]
     math_validation_pass_rate: float
     human_correction_rate: float
+    confidence_calibration: list[dict[str, Any]] = Field(default_factory=list)
+    accuracy_iterations: list[dict[str, Any]] = Field(default_factory=list)
+    roi_metrics: dict[str, Any] = Field(default_factory=dict)
     sample_size: int
     notice: str
+    v1_comparison: dict[str, Any] | None = None
+
+
+class BenchmarkRunOut(BaseModel):
+    iteration: int
+    field_accuracy: float
+    routing_accuracy: float
+    avg_latency_ms: float
+    total_samples: int
+    timestamp: str
+    calibration: list[dict[str, Any]]

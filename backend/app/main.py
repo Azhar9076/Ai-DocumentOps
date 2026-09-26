@@ -33,6 +33,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/health")
+def root_health() -> dict[str, str]:
+    return {"status": "ok", "service": "AI DocumentOps", "model": "IBM Granite 3.0 via watsonx.ai"}
+
 app.include_router(router)
 
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { AlertTriangle, CheckCircle2, Clock, ShieldAlert, XCircle } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Clock, ShieldAlert, StopCircle, XCircle } from 'lucide-react'
 import type { DocStatus } from '../lib/api'
 
 export const STATUS_META: Record<DocStatus, { label: string; classes: string; Icon: typeof CheckCircle2 }> = {
@@ -27,10 +27,11 @@ export const STATUS_META: Record<DocStatus, { label: string; classes: string; Ic
   FAILED: { label: 'Failed', classes: 'bg-rose-50 text-rose-700 border-rose-200', Icon: AlertTriangle },
   PROCESSING: { label: 'Processing', classes: 'bg-sky-50 text-sky-700 border-sky-200', Icon: Clock },
   UPLOADED: { label: 'Uploaded', classes: 'bg-slate-50 text-ink-700 border-ink-200', Icon: Clock },
+  CANCELLED: { label: 'Cancelled', classes: 'bg-slate-100 text-ink-600 border-ink-300', Icon: StopCircle },
 }
 
 export function StatusBadge({ status }: { status: DocStatus }) {
-  const meta = STATUS_META[status]
+  const meta = STATUS_META[status] || STATUS_META.FAILED
   const Icon = meta.Icon
   return (
     <span

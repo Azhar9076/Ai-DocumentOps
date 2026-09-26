@@ -45,6 +45,7 @@ class DocStatus(str, enum.Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
 
 
 class Document(Base):
@@ -61,6 +62,7 @@ class Document(Base):
     page_count: Mapped[int] = mapped_column(Integer, default=1)
     raw_text: Mapped[str] = mapped_column(Text, default="")
     validation_errors: Mapped[str] = mapped_column(Text, default="[]")
+    audit_summary: Mapped[str] = mapped_column(Text, default="")
     processing_ms: Mapped[int] = mapped_column(Integer, default=0)
 
     fields: Mapped[list[ExtractedField]] = relationship(
@@ -117,5 +119,7 @@ class AuditLog(Base):
     performed_by: Mapped[str] = mapped_column(String(128), default="system")
     timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     details: Mapped[str] = mapped_column(Text, default="")
+    run_number: Mapped[int] = mapped_column(Integer, default=1)
+    elapsed_ms: Mapped[int] = mapped_column(Integer, default=0)
 
     document: Mapped[Document] = relationship(back_populates="audit_logs")
